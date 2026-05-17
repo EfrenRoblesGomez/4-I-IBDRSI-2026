@@ -1,25 +1,41 @@
-# Sistema de Control Escolar
+# Sistema Web Escolar - Version Alfa
 
-Sistema web para la gestión de información académica de una institución educativa. Permite administrar estudiantes, grupos, materias, calificaciones y horarios.
+Este proyecto es la base de un sistema web escolar desarrollado con Flask y SQLAlchemy. Su objetivo final es apoyar tareas de control academico como la gestion de usuarios, grupos, materias, docentes, planeaciones y registros administrativos.
 
-## Características
+En el estado actual, el proyecto funciona como una version alfa enfocada en validar la estructura inicial de la aplicacion, la configuracion de Flask, la conexion con MySQL y una ruta de prueba que consulta la tabla `usuarios`.
 
-- 👤 Gestión de usuarios (administradores, docentes, personal de control escolar)
-- 📚 Administración de estudiantes y grupos
-- 📖 Registro de materias y contenido académico
-- 📋 Planeación didáctica y horarios
-- 📊 Registro de calificaciones
-- 🔐 Sistema de autenticación y autorización
+## Estado actual
+
+La aplicacion ya cuenta con:
+
+- Fabrica de aplicacion en Flask mediante `create_app()`.
+- Configuracion centralizada en `config.py`.
+- Conexion a base de datos con Flask-SQLAlchemy y PyMySQL.
+- Modelo inicial `Usuario`.
+- Ruta `/test` para comprobar consultas a la tabla `usuarios`.
+- Script SQL base en `database/schema.sql` para crear la estructura de la base de datos.
+- Archivos reservados para futuros modelos y rutas de alumnos, grupos, materias y planeacion.
+
+Algunos modulos aun estan en preparacion. Los archivos de rutas y modelos como `alumnos.py`, `grupos.py`, `materias.py` y `planeacion.py` existen como parte de la estructura del proyecto, pero todavia no contienen logica funcional.
+
+## Tecnologias
+
+- Python
+- Flask
+- Flask-SQLAlchemy
+- PyMySQL
+- MySQL o MariaDB
 
 ## Requisitos
 
-- Python 3.11+
-- MySQL/MariaDB
-- pip (gestor de paquetes de Python)
+- Python 3.11 o superior
+- MySQL/MariaDB, o acceso a una base de datos MySQL compatible
+- `pip` para instalar dependencias
+- Entorno virtual recomendado
 
-## Instalación
+## Instalacion
 
-### 1. Clonar o descargar el proyecto
+### 1. Entrar al proyecto
 
 ```bash
 cd proyecto_escolar
@@ -33,12 +49,14 @@ python -m venv .venv
 
 ### 3. Activar el entorno virtual
 
-**En Windows:**
+En Windows:
+
 ```bash
 .\.venv\Scripts\activate
 ```
 
-**En macOS/Linux:**
+En macOS/Linux:
+
 ```bash
 source .venv/bin/activate
 ```
@@ -49,157 +67,151 @@ source .venv/bin/activate
 pip install -r requeriments.txt
 ```
 
-### 5. Configurar la base de datos
+> Nota: el archivo de dependencias se llama `requeriments.txt` en este proyecto.
 
-Edita `config.py` con tus credenciales de MySQL:
+## Configuracion
 
-```python
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://usuario:contraseña@localhost:3306/control_escolar'
+La configuracion principal esta en `config.py`, dentro de la clase `Configuracion`.
+
+La aplicacion usa estas variables:
+
+- `SECRET_KEY`: clave secreta de Flask. Si no existe, se genera automaticamente con `create_key.py` y se guarda en `.secret_key`.
+- `DATABASE_URL`: cadena de conexion a MySQL. Si no se define, se usa la URL configurada por defecto en `config.py`.
+
+Ejemplo de conexion local:
+
+```bash
+set DATABASE_URL=mysql+pymysql://usuario:password@localhost:3306/control_escolar
 ```
 
-### 6. Inicializar la base de datos
+En PowerShell:
 
-Ejecuta el script SQL en tu cliente MySQL:
+```powershell
+$env:DATABASE_URL="mysql+pymysql://usuario:password@localhost:3306/control_escolar"
+```
+
+## Base de datos
+
+El archivo `database/schema.sql` contiene una propuesta de estructura para el sistema escolar, incluyendo tablas como:
+
+- `usuarios`
+- `turnos`
+- `grupos`
+- `materias`
+- `docentes`
+- `planeaciones`
+- `logs_login`
+- `audit_logs`
+
+Para cargar el script en MySQL:
 
 ```bash
 mysql -u root -p < database/schema.sql
 ```
 
-## Uso
+Tambien debe considerarse que, al iniciar la aplicacion, Flask-SQLAlchemy ejecuta `db.create_all()` dentro de `app/__init__.py`. Esto crea las tablas definidas por los modelos disponibles en Python. Actualmente, el modelo implementado es `Usuario`.
 
-### Ejecutar la aplicación
+## Ejecucion
+
+Para iniciar el servidor de desarrollo:
 
 ```bash
 python run.py
 ```
 
-La aplicación estará disponible en `http://127.0.0.1:5000`
+La aplicacion se ejecuta en:
 
-### Rutas disponibles
+```text
+http://127.0.0.1:5000
+```
 
-- `/test` - Ruta de prueba para verificar la conexión a la base de datos
+## Ruta disponible
+
+### `/test`
+
+Ruta de prueba que consulta la tabla `usuarios` usando el modelo `Usuario`.
+
+Muestra:
+
+- Si la consulta se ejecuto correctamente.
+- La cantidad de registros encontrados.
+- El primer usuario registrado.
+- Una lista de nombres disponibles.
+
+Esta ruta sirve para comprobar que Flask, SQLAlchemy y la base de datos estan comunicandose correctamente.
 
 ## Estructura del proyecto
 
-```
+```text
 proyecto_escolar/
-├── app/
-│   ├── models/              # Modelos de la base de datos
-│   │   ├── alumno.py
-│   │   ├── grupo.py
-│   │   ├── materia.py
-│   │   ├── planeacion.py
-│   │   └── usuario.py
-│   ├── routes/              # Rutas y controladores
-│   │   ├── alumnos.py
-│   │   ├── grupos.py
-│   │   ├── materias.py
-│   │   ├── planeacion.py
-│   │   └── test.py
-│   ├── templates/           # Plantillas HTML
-│   │   ├── alumnos/
-│   │   ├── auth/
-│   │   ├── calificaciones/
-│   │   ├── docentes/
-│   │   ├── grupos/
-│   │   └── materias/
-│   ├── static/              # Archivos estáticos
-│   │   ├── css/
-│   │   ├── img/
-│   │   └── js/
-│   ├── utils/               # Utilidades y funciones auxiliares
-│   └── __init__.py
-├── database/
-│   └── schema.sql           # Script de creación de tablas
-├── config.py                # Configuración de la aplicación
-├── run.py                   # Punto de entrada de la aplicación
-├── create_key.py            # Generador de claves secretas
-├── requeriments.txt         # Dependencias del proyecto
-└── README.md                # Este archivo
++-- app/
+|   +-- models/
+|   |   +-- alumno.py
+|   |   +-- grupo.py
+|   |   +-- materia.py
+|   |   +-- planeacion.py
+|   |   +-- usuario.py
+|   +-- routes/
+|   |   +-- alumnos.py
+|   |   +-- grupos.py
+|   |   +-- materias.py
+|   |   +-- planeacion.py
+|   |   +-- test.py
+|   +-- __init__.py
++-- database/
+|   +-- schema.sql
++-- .secret_key
++-- config.py
++-- create_key.py
++-- requeriments.txt
++-- run.py
++-- README.md
 ```
 
-## Configuración
+## Archivos principales
 
-### Variables de entorno
-
-Puedes configurar las siguientes variables de entorno:
-
-- `SECRET_KEY` - Clave secreta de Flask (generada automáticamente si no se proporciona)
-- `DATABASE_URL` - URL de conexión a la base de datos
-
-### Archivo config.py
-
-El archivo `config.py` contiene la configuración principal de la aplicación:
-
-```python
-class Configuracion:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or create_key.secret_key()
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'mysql+pymysql://...')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'connect_args': {
-            'ssl': {
-                'ssl_mode': 'REQUIRED'
-            }
-        }
-    }
-```
-
-## Desarrollo
-
-### Activar modo debug
-
-El servidor Flask se ejecuta en modo debug por defecto. Esto permite:
-
-- Recarga automática al cambiar archivos
-- Depurador interactivo en caso de errores
-- Salida detallada en consola
-
-### Instalar dependencias de desarrollo
-
-```bash
-pip install flask-sqlalchemy flask-login pymysql
-```
+- `run.py`: punto de entrada de la aplicacion.
+- `app/__init__.py`: crea la aplicacion Flask, inicializa la base de datos y registra rutas.
+- `config.py`: define la configuracion de Flask y SQLAlchemy.
+- `create_key.py`: genera y reutiliza una clave secreta local.
+- `app/models/usuario.py`: modelo inicial para la tabla `usuarios`.
+- `app/routes/test.py`: ruta de prueba para validar consultas.
+- `database/schema.sql`: script SQL con la estructura propuesta de la base de datos.
 
 ## Problemas comunes
 
-### Error: ModuleNotFoundError: No module named 'flask_sqlalchemy'
+### No se encuentra un modulo de Flask o SQLAlchemy
 
-**Solución:** Instala las dependencias:
+Instala las dependencias:
+
 ```bash
 pip install -r requeriments.txt
 ```
 
-### Error de conexión a la base de datos
+### Error de conexion a la base de datos
 
-**Solución:** Verifica que:
-1. MySQL esté corriendo
-2. Las credenciales en `config.py` sean correctas
-3. La base de datos esté creada
+Revisa que:
 
-### Puerto 5000 ya en uso
+- La URL de conexion sea correcta.
+- La base de datos este disponible.
+- El usuario y la contrasena tengan permisos.
+- Si usas una base remota, la configuracion SSL sea compatible.
 
-**Solución:** Ejecuta Flask en un puerto diferente:
-```bash
-python run.py --port 5001
-```
+### La ruta `/test` marca error con la tabla `usuarios`
 
-O termina el proceso usando el puerto 5000:
-```bash
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-```
+Verifica que la tabla exista y que sus columnas coincidan con el modelo `Usuario` definido en `app/models/usuario.py`.
 
-## Contribuciones
+## Siguientes pasos sugeridos
 
-Las contribuciones son bienvenidas. Para cambios importantes, abre un issue primero para discutir los cambios propuestos.
-
-## Licencia
-
-Proyecto de código abierto. Libre para usar y modificar.
+- Alinear completamente el modelo `Usuario` con el script `schema.sql`.
+- Implementar los modelos pendientes: alumnos, grupos, materias y planeaciones.
+- Registrar nuevos blueprints para las rutas funcionales.
+- Agregar plantillas HTML para las vistas del sistema.
+- Implementar autenticacion y control de roles.
+- Separar credenciales sensibles mediante variables de entorno.
 
 ## Autor
 
-Efrén Alexander Robles Gomez - 4°I
-Centro de Bachillerato Tecnologico Industrial y de Servicios N°246
-Proyecto Escolar - Sistema de Control Académico
+Efren Alexander Robles Gomez - 4o I  
+Centro de Bachillerato Tecnologico Industrial y de Servicios No. 246  
+Proyecto escolar: Sistema de Control Academico
