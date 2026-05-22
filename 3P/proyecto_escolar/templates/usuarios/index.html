@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Usuarios</title>
+  </head>
+  <body>
+    <h1>Listado de usuarios</h1>
+    {% if usuarios %}
+      <ul>
+        {% for u in usuarios %}
+          <li>{{ u.nombre or 'Sin nombre' }} — {{ u.usuario or 'sin usuario' }} — {{ u.rol or 'sin rol' }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay usuarios registrados.</p>
+    {% endif %}
+  </body>
+</html>
